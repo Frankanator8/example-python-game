@@ -1,7 +1,11 @@
 import pygame
 
+from core.component import Component
+
+
 class Text: # allows for renderable text
     def __init__(self, text, font, color, pos, outline=0, outline_color=None):
+        super().__init__()
         self.font_render = None
         self.text = text
         self.font = font
@@ -63,8 +67,8 @@ class Text: # allows for renderable text
                     mask = pygame.mask.from_surface(text)
                     self.outline_render.append(pygame.Surface((text.get_width()+self.outline*4, text.get_height()+self.outline*4), pygame.SRCALPHA))
                     for x, y in mask.outline():
-                        for xO in range(-round(self.outline)/2, round(self.outline/2)+1):
-                            for yO in range(-round(self.outline)/2, round(self.outline/2)+1):
+                        for xO in range(-round(self.outline/2), round(self.outline/2)+1):
+                            for yO in range(-round(self.outline/2), round(self.outline/2)+1):
                                 self.outline_render[-1].set_at((self.outline*2+x+xO, self.outline*2+y+yO), self.outline_color)
 
 
@@ -80,3 +84,11 @@ class Text: # allows for renderable text
                 if self.outline > 0:
                     screen.blit(self.outline_render[index], (self.pos[0]-self.outline*2, self.pos[1]+ index * (self.font[1] + 2)-self.outline*2))
                 screen.blit(render, (self.pos[0], self.pos[1] + index * (self.font[1] + 2)))
+
+class TextRender(Component):
+    def __init__(self, gameObject, text, font, color, outline=0, outline_color=None):
+        super().__init__(gameObject)
+        self.textObj = Text(text, font, color, self.gameObject.absolutePosition, outline=outline, outline_color=outline_color)
+
+    def update(self, displayTarget, dt, keys, mouseClicked, mousePos):
+        self.textObj.render(displayTarget)
